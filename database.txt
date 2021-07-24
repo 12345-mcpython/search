@@ -1,0 +1,33 @@
+Backup data : create table so_backup as select * from so where 1=1;
+
+
+Clear 重复:
+(so_backup)
+create temporary table tmp select distinct title,url from so_backup;
+delete from so_backup;
+insert into so_backup (title,url) select title,url from tmp;
+drop table tmp;
+
+(so)
+create temporary table tmp select distinct title,url from so;
+delete from so;
+insert into so (title,url) select title,url from tmp;
+drop table tmp;
+
+id归零:
+(so)
+alter table so drop id;
+alter table so add id int not null primary key auto_increment first;
+
+(so_backup)
+alter table so_backup drop id;
+alter table so_backup add id int not null primary key auto_increment first;
+
+
+Create test tables:
+CREATE TABLE IF NOT EXISTS `test`(
+   `id` INT UNSIGNED AUTO_INCREMENT,
+   `title` VARCHAR(1000) NOT NULL,
+   `url` VARCHAR(4000) NOT NULL,
+   PRIMARY KEY ( `id` )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

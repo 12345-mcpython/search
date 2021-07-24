@@ -1,0 +1,47 @@
+{% extends "main.html" %}
+
+{% block header %}
+<title>{{ title }} - 搜索结果</title>
+<link rel="stylesheet" href="/static/css/index.css">
+{% endblock %}
+
+{% block content %}
+<header style="height: 60px;">
+    <div class="navbar-container">
+
+        <form action="/search">
+            <a href="/" class="navbar-logo" style="color: rgb(95, 95, 95);">MC</a>
+            <div style="padding-top: 12px;">
+                <input class="mdui-center mdui-textfield-input" name="q" value="{{ title }}" style="width: 50%">
+            </div>
+        </form>
+    </div>
+    <div class="header-tag">共找到{{ count }}条记录 - 用时{{ time_cost }}s</div>
+</header>
+<section>
+    <div class="mdui-container">
+        {% if result %}
+        {% for item in result %}
+        <div class="result-item mdui-center mdui-shadow-2">
+            <div class="item-title">
+                <a href="{{ item.url }}" target="_blank">{{ item.title }}</a>
+            </div>
+        </div>
+        {% endfor %}
+        <div class="result-item mdui-center mdui-shadow-2">
+            <div class="item-title">
+                {% if has_prep %}
+                <a href="{{ page_prep }}">&lt; 上一页</a>
+                {% endif %}
+                {% if has_next %}
+                <a href="{{ page_next }}">&gt; 下一页</a>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+        <p>未找到结果<p>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}

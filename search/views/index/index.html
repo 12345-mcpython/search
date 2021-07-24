@@ -1,0 +1,21 @@
+{% extends "main.html" %}
+
+{% block header %}
+<title>MC一下,你不知道</title>
+<link rel="stylesheet" href="/static/css/index.css">
+{% endblock %}
+
+{% block content %}
+<div class="mdui-container">
+    <div class="mdui-typo-display-4-opacity" style="margin-top: 12%; margin-bottom: 3%">MC</div>
+    <!-- 浮动标签 -->
+    <form action="/search">
+        <div class="mdui-textfield mdui-textfield-floating-label">
+            <label class="mdui-center mdui-textfield-label" style="width: 50%">
+                MC一下
+            </label>
+            <input class="mdui-center mdui-textfield-input" name="q" style="width: 50%">
+        </div>
+    </form>
+</div>
+{% endblock %}
