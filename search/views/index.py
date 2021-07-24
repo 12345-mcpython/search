@@ -26,7 +26,7 @@ def so():
     start1 = (current_page - 1) * 20  # 10 20 (current_page-1)*10
     end1 = current_page * 20  # 20 30  current_page*10
     # print(start1, end)
-    if not request.args.get("q"):
+    if not request.args.get("q") or " " in request.args.get("q"):
         return redirect("/")
     start = time.time()
     sql = Simple(Config.MYSQL['MYSQL_HOST'], Config.MYSQL["MYSQL_PORT"], Config.MYSQL['MYSQL_USER'],
