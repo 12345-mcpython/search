@@ -172,7 +172,6 @@ class MCCrawler:
                 self.duplicate_count += 1
                 if verbose:
                     print("Have duplicate url! Duplicate count: ", end="")
-                print(self.duplicate_count)
                 return True
         return False
 
@@ -190,10 +189,13 @@ class MCCrawler:
         print("Request Successful count: {}".format(self.successful_count))
         print("Request Invalid count: {}".format(self.invalid_count))
         print("Request Duplicate count: {}".format(self.duplicate_count))
-        print('Request Error List is in error.txt')
-        with open("error.txt", "w") as e:
-            for i in self.error_list:
-                e.write(str(i) + "\n\n")
+        if len(self.error_list) != 0:
+            print('Request Error List is in error.txt')
+            with open("error.txt", "w") as e:
+                for i in self.error_list:
+                    e.write(str(i) + "\n\n")
+        else:
+            print("No error!")
         print("Use time: " + str(round(use_time / 60, 2)) + "min")
 
 
