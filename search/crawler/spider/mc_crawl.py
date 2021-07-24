@@ -1,3 +1,4 @@
+import sys
 import time
 
 import requests
@@ -20,6 +21,7 @@ def disable_useless_url(url):
 
 
 def request(url):
+    print("Request url: ", url)
     memcached_title = get_memcached(url)
     if memcached_title:
         print("Memcached has cache. cache: " + memcached_title, ", url: " + url)
@@ -32,6 +34,7 @@ def request(url):
 
 
 def request_clear(url):
+    print("Request url: ", url)
     req = requests.get(url, headers=Config.HEADERS, timeout=15)
     req.encoding = req.apparent_encoding
     req.raise_for_status()
@@ -79,12 +82,14 @@ def test_title(url, text):
 
 class MCCrawler:
     def __init__(self):
+        self.start = time.time()
         self.db = Simple(Config.MYSQL['MYSQL_HOST'], Config.MYSQL["MYSQL_PORT"], Config.MYSQL['MYSQL_USER'],
                          Config.MYSQL['MYSQL_PASSWORD'], "so")
         self.error_count = 0
         self.crawl_count = 0
         self.successful_count = 0
         self.duplicate_count = 0
+        self.invalid_count = 0
         self.error_list = []
 
     def get_info(self):
@@ -101,16 +106,20 @@ class MCCrawler:
                 ls = []
                 if disable_useless_url(i):
                     result = url_join(scheme, i.get("href"))
-                    print("Request {} url:".format(self.crawl_count), result)
+                    print("Parsing {} url:".format(self.crawl_count), result)
                     if self.test_in_database(result):
+                        self.invalid_count += 1
                         continue
                     if test_execute_file(result):
+                        self.invalid_count += 1
                         continue
                     req = request(result)
                     if not req:
+                        self.invalid_count += 1
                         continue
                     title = test_title(result, req.text)
                     if not title:
+                        self.invalid_count += 1
                         continue
                     ls.append(title.strip().replace("\n", ""))
                     print("Successful parse title:", title.replace("\n", "").strip())
@@ -127,6 +136,21 @@ class MCCrawler:
             a = traceback.format_exc()
             self.error_list.append(a)
             self.error_count += 1
+        except KeyboardInterrupt:
+            use_time = time.time() - self.start
+            print("\n" * 3)
+            print('Stopped! ! !')
+            print("Request count: {}".format(self.crawl_count))
+            print("Request Error count: {}".format(self.error_count))
+            print("Request Successful count: {}".format(self.successful_count))
+            print("Request Invalid count: {}".format(self.invalid_count))
+            print("Request Duplicate count: {}".format(self.duplicate_count))
+            print('Request Error List is in error.txt')
+            with open("error.txt", "w") as e:
+                for i in self.error_list:
+                    e.write(str(i) + "\n\n")
+            print("Use time: " + str(round(use_time / 60, 2)) + "min")
+            sys.exit(0)
 
     def test_in_database(self, url):
         a = self.db.query_data("so_backup", "url")
@@ -140,18 +164,19 @@ class MCCrawler:
         return False
 
     def main(self):
-        print("Start crawl")
-        start = time.time()
+        print("Start crawl.")
         a = self.get_info()
         for i in a:
             self.crawl_url(i)
-        use_time = time.time() - start
+        use_time = time.time() - self.start
+        print("\n" * 3)
         print("Crawl successful! ")
-        print("Crawl count: {}".format(self.crawl_count))
-        print("Error count: {}".format(self.error_count))
-        print("Successful count: {}".format(self.successful_count))
-        print("Duplicate count: {}".format(self.duplicate_count))
-        print('Error List in error.txt')
+        print("Request count: {}".format(self.crawl_count))
+        print("Request Error count: {}".format(self.error_count))
+        print("Request Successful count: {}".format(self.successful_count))
+        print("Request Invalid count: {}".format(self.invalid_count))
+        print("Request Duplicate count: {}".format(self.duplicate_count))
+        print('Request Error List is in error.txt')
         with open("error.txt", "w") as e:
             for i in self.error_list:
                 e.write(str(i) + "\n\n")
