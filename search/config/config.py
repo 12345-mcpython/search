@@ -1,14 +1,17 @@
 import os
 import random
+from dotenv import find_dotenv, load_dotenv
+
+env = load_dotenv(find_dotenv())
 
 
 class Config:
     BASE_DIR = os.path.dirname(os.path.dirname(__file__))
     MYSQL = dict(
-        MYSQL_HOST="127.0.0.1",
-        MYSQL_PORT=3306,
-        MYSQL_USER="root",
-        MYSQL_PASSWORD="database"
+        MYSQL_HOST=os.environ.get("MYSQL_HOST", "127.0.0.1"),
+        MYSQL_PORT=int(os.environ.get("MYSQL_PORT"), 3306),
+        MYSQL_USER=os.environ.get("MYSQL_USER", "root"),
+        MYSQL_PASSWORD=os.environ.get("MYSQL_PASSWORD")
     )
     ls = [
         "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50",
