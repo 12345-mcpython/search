@@ -10,7 +10,7 @@ from search.database.mysql import Simple
 from search.utils.parse_url import get_url_scheme, url_join
 
 mc = Client(["127.0.0.1:11211"], debug=True)
-verbose = False
+verbose = True
 
 
 def disable_useless_url(url):
@@ -104,11 +104,11 @@ class MCCrawler:
         self.error_list = []
 
     def get_info(self):
-        return self.db.query_data("so_backup", "*")
+        return self.db.query_data("baidu", "*")
 
     def crawl_url(self, url):
         try:
-            print("Base Request: " + str(self.base_count))
+            print("Get Request: " + str(self.base_count))
             base_url = url[2]
             scheme = get_url_scheme(base_url)
             r = request_clear(base_url)
@@ -171,7 +171,7 @@ class MCCrawler:
             if url1 == url:
                 self.duplicate_count += 1
                 if verbose:
-                    print("Have duplicate url! Duplicate count: ", end="")
+                    print("Have duplicate url! Duplicate count: " + str(self.duplicate_count))
                 return True
         return False
 
@@ -189,11 +189,17 @@ class MCCrawler:
         print("Request Successful count: {}".format(self.successful_count))
         print("Request Invalid count: {}".format(self.invalid_count))
         print("Request Duplicate count: {}".format(self.duplicate_count))
-        if len(self.error_list) != 0:
+        if len(self.error_list) == 0:
             print('Request Error List is in error.txt')
-            with open("error.txt", "w") as e:
-                for i in self.error_list:
-                    e.write(str(i) + "\n\n")
+            try:
+                with open("error.txt", "w") as e:
+                    for i in self.error_list:
+                        e.write(str(i) + "\n\n")
+            except Exception:
+                print("Write Error!")
+                import traceback
+                traceback.print_exc()
+
         else:
             print("No error!")
         print("Use time: " + str(round(use_time / 60, 2)) + "min")
